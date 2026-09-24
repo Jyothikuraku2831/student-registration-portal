@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Student Registration &amp; Result Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-900:#0f2436;
+    --navy-800:#16354d;
+    --navy-700:#204a68;
+    --paper:#f6f3ec;
+    --paper-2:#ffffff;
+    --ink:#1c2a33;
+    --ink-soft:#51606a;
+    --gold:#c79a33;
+    --gold-deep:#a97f22;
+    --line:#d8d2c2;
+    --ok:#3f7d58;
+    --ok-bg:#e7f2ea;
+    --bad:#b23a48;
+    --bad-bg:#fbe9eb;
+    --radius:10px;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *,*::before,*::after{box-sizing:inherit;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#101a22; --paper-2:#16222c; --ink:#eef2f4; --ink-soft:#a7b4bc;
+      --line:#2a3944; --navy-900:#0a1620; --navy-800:#0f2436;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#101a22; --paper-2:#16222c; --ink:#eef2f4; --ink-soft:#a7b4bc;
+    --line:#2a3944; --navy-900:#0a1620; --navy-800:#0f2436;
+  }
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',Georgia,'Times New Roman',serif;
+    color:var(--navy-900);
+    margin:0;
+  }
+  :root[data-theme="dark"] h1, :root[data-theme="dark"] h2, :root[data-theme="dark"] h3{color:var(--ink);}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) h1, :root:not([data-theme="light"]) h2, :root:not([data-theme="light"]) h3{color:var(--ink);}
+  }
+
+  /* ---------- header ---------- */
+  header.band{
+    background:linear-gradient(160deg,var(--navy-900),var(--navy-700));
+    color:#f2efe6;
+    padding:2.4rem 1.5rem 3.2rem;
+    padding-top:calc(2.4rem + env(safe-area-inset-top,0px));
+  }
+  .band-inner{max-width:900px;margin:0 auto;}
+  .eyebrow{
+    display:inline-block;
+    font-size:.78rem;
+    color:var(--gold);
+    letter-spacing:.02em;
+    border-bottom:1px solid rgba(199,154,51,.5);
+    padding-bottom:.35rem;
+    margin-bottom:.9rem;
+  }
+  header.band h1{color:#faf8f2;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;line-height:1.15;}
+  header.band p{max-width:46ch;color:#c9d3d9;margin-top:.7rem;font-size:1rem;}
+
+  /* ---------- shell ---------- */
+  main{max-width:900px;margin:0 auto;padding:0 1.5rem 4rem;}
+  .register-card{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-top:-2.2rem;
+    box-shadow:0 18px 40px -22px rgba(15,36,54,.35);
+    overflow:hidden;
+  }
+
+  /* ---------- stepper (tabbed ledger) ---------- */
+  .tabs{
+    display:flex;
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+  }
+  .tab{
+    flex:1 1 0;
+    min-width:120px;
+    text-align:left;
+    padding:1rem 1.1rem;
+    background:none;
+    border:none;
+    border-right:1px solid var(--line);
+    font-family:'Inter',sans-serif;
+    font-size:.85rem;
+    color:var(--ink-soft);
+    cursor:pointer;
+    position:relative;
+  }
+  .tab:last-child{border-right:none;}
+  .tab .num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:1.5rem;height:1.5rem;border-radius:50%;
+    background:var(--paper);border:1px solid var(--line);
+    font-size:.75rem;margin-right:.5rem;color:var(--ink-soft);
+  }
+  .tab.active{color:var(--navy-900);}
+  .tab.active .num{background:var(--gold);border-color:var(--gold);color:#2a2107;}
+  .tab.done .num{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .tab.active::after{
+    content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--gold);
+  }
+  .tab:disabled{cursor:not-allowed;opacity:.55;}
+
+  .panel{padding:2rem 1.6rem;}
+  .panel h2{font-size:1.3rem;margin-bottom:.3rem;}
+  .panel .hint{color:var(--ink-soft);font-size:.88rem;margin-bottom:1.6rem;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem 1.2rem;}
+  .field{display:flex;flex-direction:column;gap:.4rem;}
+  .field.full{grid-column:1/-1;}
+  label{font-size:.82rem;font-weight:600;color:var(--navy-800);}
+  input,select{
+    font:inherit;
+    padding:.62rem .75rem;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:var(--paper);
+    color:var(--ink);
+    width:100%;
+  }
+  input:focus-visible,select:focus-visible,button:focus-visible{
+    outline:2px solid var(--gold-deep);outline-offset:2px;
+  }
+  input:invalid:not(:placeholder-shown){border-color:var(--bad);}
+  .err-msg{font-size:.76rem;color:var(--bad);min-height:1em;}
+  small.note{color:var(--ink-soft);font-size:.76rem;}
+
+  .marks-table{width:100%;border-collapse:collapse;margin-top:.3rem;}
+  .marks-table th{
+    text-align:left;font-size:.78rem;color:var(--ink-soft);
+    padding:.4rem .5rem;border-bottom:1px solid var(--line);
+    font-weight:600;
+  }
+  .marks-table td{padding:.45rem .5rem;border-bottom:1px solid var(--line);}
+  .marks-table input{max-width:6.5rem;}
+
+  .actions{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:1.2rem 1.6rem 1.8rem;border-top:1px solid var(--line);
+  }
+  button.btn{
+    font:inherit;font-weight:600;font-size:.9rem;
+    padding:.68rem 1.4rem;border-radius:7px;cursor:pointer;border:1px solid transparent;
+  }
+  .btn-primary{background:var(--navy-900);color:#fdf9ee;}
+  .btn-primary:hover{background:var(--navy-800);}
+  .btn-ghost{background:none;border-color:var(--line);color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--ink-soft);}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* ---------- result ---------- */
+  #result{display:none;margin-top:2.2rem;}
+  .result-card{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .result-head{
+    background:linear-gradient(160deg,var(--navy-800),var(--navy-700));
+    color:#f4f1e8;padding:1.6rem;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;align-items:flex-start;
+  }
+  .result-head h2{color:#faf8f2;font-size:1.35rem;}
+  .result-head .sub{color:#c9d3d9;font-size:.85rem;margin-top:.25rem;}
+  .grade-pill{
+    background:var(--gold);color:#2a2107;font-family:'Fraunces',serif;font-weight:600;
+    font-size:1.5rem;padding:.3rem 1rem;border-radius:8px;line-height:1.2;text-align:center;min-width:3.2rem;
+  }
+  .grade-pill span{display:block;font-family:'Inter',sans-serif;font-size:.62rem;font-weight:600;letter-spacing:.03em;color:#4a3a10;}
+
+  .detail-strip{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:1rem;padding:1.3rem 1.6rem;border-bottom:1px solid var(--line);
+    font-size:.88rem;
+  }
+  .detail-strip div span{display:block;color:var(--ink-soft);font-size:.74rem;margin-bottom:.15rem;}
+
+  table.report{width:100%;border-collapse:collapse;}
+  table.report th{
+    text-align:left;padding:.7rem 1.6rem;font-size:.78rem;color:var(--ink-soft);
+    border-bottom:1px solid var(--line);font-weight:600;
+  }
+  table.report td{padding:.65rem 1.6rem;border-bottom:1px solid var(--line);font-size:.92rem;}
+  table.report tr:last-child td{border-bottom:none;}
+  .status-pass{color:var(--ok);background:var(--ok-bg);padding:.15rem .55rem;border-radius:5px;font-size:.78rem;font-weight:600;}
+  .status-fail{color:var(--bad);background:var(--bad-bg);padding:.15rem .55rem;border-radius:5px;font-size:.78rem;font-weight:600;}
+
+  .summary-row{
+    display:flex;justify-content:flex-end;gap:2.2rem;padding:1.3rem 1.6rem;
+    flex-wrap:wrap;
+  }
+  .summary-row div{text-align:right;}
+  .summary-row span{display:block;font-size:.74rem;color:var(--ink-soft);}
+  .summary-row strong{font-family:'Fraunces',serif;font-size:1.25rem;color:var(--navy-900);}
+
+  .edit-link{
+    text-align:center;padding:1rem 1.6rem 1.6rem;
+  }
+  .edit-link button{background:none;border:none;color:var(--gold-deep);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;}
+
+  @media (max-width:640px){
+    .grid{grid-template-columns:1fr;}
+    .tab{min-width:100px;font-size:.78rem;padding:.85rem .7rem;}
+    .marks-table{display:block;overflow-x:auto;}
+  }
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="band-inner">
+    <span class="eyebrow">MINI PROJECT · HTML5 + CSS3</span>
+    <h1>Student Registration &amp; Result Portal</h1>
+    <p>Register a student, record subject marks and generate a styled result — a single-page demo of forms, native validation, Flexbox/Grid layout and responsive CSS.</p>
+  </div>
+</header>
+
+<main>
+  <form class="register-card" id="portalForm" novalidate>
+
+    <nav class="tabs" id="tabs">
+      <button type="button" class="tab active" data-step="0"><span class="num">1</span>Personal details</button>
+      <button type="button" class="tab" data-step="1" disabled><span class="num">2</span>Course</button>
+      <button type="button" class="tab" data-step="2" disabled><span class="num">3</span>Marks</button>
+    </nav>
+
+    <!-- STEP 0 : personal details -->
+    <section class="panel step" data-step="0">
+      <h2>Personal details</h2>
+      <p class="hint">Fields marked with the browser's built-in validation will block submission until filled correctly.</p>
+      <div class="grid">
+        <div class="field full">
+          <label for="fullName">Full name</label>
+          <input id="fullName" name="fullName" type="text" required pattern="[A-Za-z][A-Za-z .]{2,49}" placeholder="e.g. Jyothi Reddy">
+          <span class="err-msg"></span>
+        </div>
+        <div class="field">
+          <label for="rollNo">Roll number</label>
+          <input id="rollNo" name="rollNo" type="text" required pattern="[A-Za-z0-9]{6,12}" placeholder="e.g. 23A91A6112">
+          <span class="err-msg"></span>
+        </div>
+        <div class="field">
+          <label for="dob">Date of birth</label>
+          <input id="dob" name="dob" type="date" required>
+          <span class="err-msg"></span>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="jyothi@example.com">
+          <span class="err-msg"></span>
+        </div>
+        <div class="field">
+          <label for="phone">Phone number</label>
+          <input id="phone" name="phone" type="tel" required pattern="[6-9][0-9]{9}" placeholder="10-digit mobile number">
+          <span class="err-msg"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 1 : course -->
+    <section class="panel step" data-step="1" hidden>
+      <h2>Course selection</h2>
+      <p class="hint">Choosing a course loads its subject list on the next step.</p>
+      <div class="grid">
+        <div class="field">
+          <label for="course">Course / branch</label>
+          <select id="course" name="course" required>
+            <option value="" disabled selected>Select a course</option>
+            <option value="AIML">B.Tech — AI &amp; Machine Learning</option>
+            <option value="CSE">B.Tech — Computer Science</option>
+            <option value="ECE">B.Tech — Electronics &amp; Communication</option>
+            <option value="MECH">B.Tech — Mechanical Engineering</option>
+          </select>
+          <span class="err-msg"></span>
+        </div>
+        <div class="field">
+          <label for="semester">Semester</label>
+          <select id="semester" name="semester" required>
+            <option value="" disabled selected>Select semester</option>
+            <option>Semester 1</option><option>Semester 2</option><option>Semester 3</option>
+            <option>Semester 4</option><option>Semester 5</option><option>Semester 6</option>
+          </select>
+          <span class="err-msg"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2 : marks -->
+    <section class="panel step" data-step="2" hidden>
+      <h2>Subject marks</h2>
+      <p class="hint">Enter marks out of 100 for each subject (pass mark is 35).</p>
+      <table class="marks-table">
+        <thead><tr><th>Subject</th><th>Marks (0–100)</th></tr></thead>
+        <tbody id="marksBody"><!-- injected by JS --></tbody>
+      </table>
+    </section>
+
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" id="backBtn" style="visibility:hidden;">Back</button>
+      <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+      <button type="submit" class="btn btn-primary" id="submitBtn" hidden>Generate result</button>
+    </div>
+  </form>
+
+  <!-- RESULT -->
+  <section id="result">
+    <div class="result-card">
+      <div class="result-head">
+        <div>
+          <h2 id="rName">—</h2>
+          <div class="sub" id="rMeta">—</div>
+        </div>
+        <div class="grade-pill" id="rGrade">–<span>GRADE</span></div>
+      </div>
+      <div class="detail-strip">
+        <div><span>Roll number</span><strong id="rRoll">—</strong></div>
+        <div><span>Course</span><strong id="rCourse">—</strong></div>
+        <div><span>Semester</span><strong id="rSem">—</strong></div>
+        <div><span>Result</span><strong id="rStatus">—</strong></div>
+      </div>
+      <table class="report">
+        <thead><tr><th>Subject</th><th>Marks obtained</th><th>Status</th></tr></thead>
+        <tbody id="rBody"></tbody>
+      </table>
+      <div class="summary-row">
+        <div><span>Total</span><strong id="rTotal">—</strong></div>
+        <div><span>Percentage</span><strong id="rPct">—</strong></div>
+      </div>
+      <div class="edit-link"><button type="button" id="editBtn">Edit details</button></div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  const subjectsByCourse = {
+    AIML: ["Data Structures","Machine Learning","Deep Learning","Python Programming","Mathematics for AI","Web Technologies"],
+    CSE:  ["Data Structures","Operating Systems","Database Systems","Computer Networks","OOP with Java","Web Technologies"],
+    ECE:  ["Digital Electronics","Signals & Systems","Microprocessors","Communication Systems","Circuit Theory","Web Technologies"],
+    MECH: ["Thermodynamics","Fluid Mechanics","Manufacturing Technology","Machine Design","Engineering Mechanics","Web Technologies"]
+  };
+
+  const form = document.getElementById('portalForm');
+  const tabs = [...document.querySelectorAll('.tab')];
+  const steps = [...document.querySelectorAll('.step')];
+  const backBtn = document.getElementById('backBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const courseSelect = document.getElementById('course');
+  const marksBody = document.getElementById('marksBody');
+  let current = 0;
+
+  function showStep(i){
+    steps.forEach(s => s.hidden = Number(s.dataset.step) !== i);
+    tabs.forEach(t => {
+      const n = Number(t.dataset.step);
+      t.classList.toggle('active', n === i);
+      t.classList.toggle('done', n < i);
+      t.disabled = n > i;
+    });
+    backBtn.style.visibility = i === 0 ? 'hidden' : 'visible';
+    nextBtn.hidden = i === steps.length - 1;
+    submitBtn.hidden = i !== steps.length - 1;
+    current = i;
+  }
+
+  function validateStep(i){
+    const fields = steps[i].querySelectorAll('input,select');
+    let ok = true;
+    fields.forEach(f => {
+      const msg = f.parentElement.querySelector('.err-msg');
+      if(!f.checkValidity()){
+        ok = false;
+        if(msg) msg.textContent = f.validationMessage;
+        f.reportValidity();
+      } else if(msg){
+        msg.textContent = '';
+      }
+    });
+    return ok;
+  }
+
+  function buildMarksRows(){
+    const list = subjectsByCourse[courseSelect.value] || [];
+    marksBody.innerHTML = list.map((subj, idx) => `
+      <tr>
+        <td>${subj}</td>
+        <td>
+          <input type="number" min="0" max="100" required
+                 name="mark_${idx}" data-subject="${subj}"
+                 aria-label="Marks for ${subj}">
+        </td>
+      </tr>`).join('');
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if(!validateStep(current)) return;
+    if(current === 1) buildMarksRows();
+    showStep(Math.min(current + 1, steps.length - 1));
+  });
+
+  backBtn.addEventListener('click', () => showStep(Math.max(current - 1, 0)));
+
+  document.getElementById('editBtn').addEventListener('click', () => {
+    document.getElementById('result').style.display = 'none';
+    form.style.display = '';
+    showStep(0);
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  function gradeFor(pct){
+    if(pct >= 90) return 'O';
+    if(pct >= 80) return 'A+';
+    if(pct >= 70) return 'A';
+    if(pct >= 60) return 'B+';
+    if(pct >= 50) return 'B';
+    if(pct >= 35) return 'C';
+    return 'F';
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!validateStep(2)) return;
+
+    const marks = [...marksBody.querySelectorAll('input')].map(inp => ({
+      subject: inp.dataset.subject,
+      score: Number(inp.value)
+    }));
+    const total = marks.reduce((sum, m) => sum + m.score, 0);
+    const max = marks.length * 100;
+    const pct = max ? (total / max * 100) : 0;
+    const anyFail = marks.some(m => m.score < 35);
+    const grade = anyFail ? 'F' : gradeFor(pct);
+
+    document.getElementById('rName').textContent = document.getElementById('fullName').value;
+    document.getElementById('rMeta').textContent = document.getElementById('email').value + ' · ' + document.getElementById('phone').value;
+    document.getElementById('rRoll').textContent = document.getElementById('rollNo').value;
+    document.getElementById('rCourse').textContent = courseSelect.options[courseSelect.selectedIndex].text;
+    document.getElementById('rSem').textContent = document.getElementById('semester').value;
+    document.getElementById('rStatus').textContent = anyFail ? 'Fail' : 'Pass';
+    document.getElementById('rGrade').innerHTML = grade + '<span>GRADE</span>';
+    document.getElementById('rTotal').textContent = total + ' / ' + max;
+    document.getElementById('rPct').textContent = pct.toFixed(1) + '%';
+
+    document.getElementById('rBody').innerHTML = marks.map(m => `
+      <tr>
+        <td>${m.subject}</td>
+        <td>${m.score}</td>
+        <td><span class="${m.score >= 35 ? 'status-pass' : 'status-fail'}">${m.score >= 35 ? 'Pass' : 'Fail'}</span></td>
+      </tr>`).join('');
+
+    form.style.display = 'none';
+    const result = document.getElementById('result');
+    result.style.display = 'block';
+    result.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  showStep(0);
+})();
+</script>
+</body>
+</html>
